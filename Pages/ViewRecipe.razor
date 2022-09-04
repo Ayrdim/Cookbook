@@ -1,0 +1,91 @@
+@using Cookbook.Components
+@inject NavigationManager NavigationManager
+@inject RecipesContainer RecipesContainer
+@inject IDialogService DialogService
+
+@page "/viewRecipe/{UID:int}"
+
+<MudAppBar Bottom="false" position="fixed" Color="Color.Primary" Elevation="1">
+    <MudIconButton @onclick="NavigateToCookbook" Icon="@Icons.Filled.ArrowBack" Color="Color.Inherit" Edge="Edge.Start" />
+    <MudSpacer />
+    <MudIconButton @onclick="DeleteRecipe" Icon="@Icons.Filled.Delete" Color="Color.Inherit" />
+    <MudIconButton @onclick="NavigateToEditRecipe" Icon="@Icons.Filled.Edit" Color="Color.Inherit" Edge="Edge.End" />
+</MudAppBar>
+
+<MudMainContent>
+    @if (null != recipe)
+    {
+        <h1>@recipe.Title</h1>
+
+        <MudList Clickable="false">
+                @foreach (var ingredient in recipe.Ingredients)
+                {
+                    <MudListItem Text="@ingredient.GetDescription()"/>
+                }
+        </MudList>
+    }
+    else 
+    {
+        <h1>Sorry, looks like that recipe doesn't exist!</h1>
+    }
+</MudMainContent>
+
+@code {
+    [Parameter]
+    public int UID { get; set; }
+
+    private Recipe? recipe = null;
+
+    private bool GetValidRecipeFromContainer()
+    {
+        bool isValid = false;
+        
+        recipe = RecipesContainer.recipes.Find(r => UID == r.UID);
+
+        if (null != recipe)
+        {
+            isValid = recipe.IsValid();
+        }
+
+        return isValid;
+    }
+
+    protected override void OnInitialized()
+    {
+        @* Alt option is to store the selected recipe on the state then retrieve it, whats better? *@
+
+        Recipe? selectedRecipe = RecipesContainer.recipes.Find(r => UID == r.UID);
+
+        if (null != selectedRecipe)
+        {
+            recipe = selectedRecipe;
+        }
+    }
+
+    private void NavigateToCookbook()
+    {
+        NavigationManager.NavigateTo("/recipeList");
+    }
+
+    private void NavigateToEditRecipe()
+    {
+        NavigationManager.NavigateTo("editRecipe/" + UID);
+    }
+
+    async Task DeleteRecipe()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "Do you really want to delete '" + recipe.Title + "'? This process cannot be undone.");
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = DialogService.Show<DeleteDialog>("Delete recipe", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            RecipesContainer.recipes.Remove(recipe);
+            NavigateToCookbook();
+        }
+    }
+}

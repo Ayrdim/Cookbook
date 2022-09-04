@@ -1,0 +1,52 @@
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="Name" Label="Name" Variant="Variant.Outlined" Required="true" />
+        <MudTextField @bind-Value="Quantity" Label="Quantity" Variant="Variant.Outlined" Required="true" />
+        <MudTextField @bind-Value="Units" Label="Units" Variant="Variant.Outlined" Required="false" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Delete">Delete</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Done">Done</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    private string? Name { get; set; }
+    private uint? Quantity { get; set; }
+    private string? Units { get; set; }
+
+    [Parameter]
+    public Ingredient? Ingredient { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (null != Ingredient)
+        {
+            Name     = Ingredient.Name;
+            Quantity = Ingredient.Quantity;
+            Units    = Ingredient.Units;
+        }
+    }
+
+    void Delete() => MudDialog.Close();
+
+    void Done()
+    {
+        @* TODO: Validate relevant fields *@
+
+        if (null == Ingredient)
+        {
+            Ingredient = new();
+        }
+
+        Ingredient.Name     = Name;
+        Ingredient.Quantity = Quantity ?? 0;
+        Ingredient.Units    = Units;
+
+        MudDialog.Close(DialogResult.Ok(Ingredient));
+    }
+}

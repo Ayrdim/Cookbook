@@ -1,0 +1,22 @@
+@* <MudCard Outlined="true" Style="margin: 5px">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">The Story Book</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+        </CardHeaderActions>
+    </MudCardHeader>
+</MudCard> *@
+
+<MudDivider />
+<MudListItem @onclick="OnClick" Text="@Title"/>
+<MudDivider />
+
+@code {
+    [Parameter]
+    public string? Title { get; set; } = "Unknown";
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+}

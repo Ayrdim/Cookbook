@@ -1,0 +1,41 @@
+@page "/addRecipe"
+@using Cookbook.Components
+@inject RecipesContainer RecipesContainer
+@inject NavigationManager NavigationManager
+
+
+<MudAppBar Bottom="false" position="fixed" Color="Color.Primary" Elevation="1">
+    <MudIconButton @onclick="NavigateToCookbook" Icon="@Icons.Filled.ArrowBack" Color="Color.Inherit" Label="My name jeff" Edge="Edge.Start" />
+    <MudSpacer />
+    <MudIconButton @onclick="SaveRecipe" Icon="@Icons.Material.Filled.Save" Color="Color.Inherit" Edge="Edge.End" />
+</MudAppBar>
+
+<MudMainContent>
+    <RecipeEditor Recipe="recipe" />
+</MudMainContent>
+
+@code {
+    private Recipe recipe = new();
+    
+    private void NavigateToCookbook()
+    {
+        NavigationManager.NavigateTo("/recipeList");
+    }
+
+    private void SaveRecipe()
+    {
+        @* Validate input fields *@
+        @* Save to DB - if err then alert user *@
+        @* Get the UID value for the recipe we just stored in the db *@
+        @* Add it to the state *@
+        @* Return back to the cookbook *@
+
+
+        if (recipe.IsValid())
+        {
+            recipe.UID = (uint)RecipesContainer.recipes.Count(); // Todo replace this with a responce from the db with the actual uid
+            RecipesContainer.recipes.Add(recipe);
+            NavigationManager.NavigateTo("/recipeList");
+        }
+    }
+}

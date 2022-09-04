@@ -1,0 +1,60 @@
+﻿@page "/"
+@page "/recipeList"
+@using Cookbook.Components
+@inject NavigationManager NavigationManager
+@inject RecipesContainer RecipesContainer
+
+<MudAppBar Bottom="false" position="fixed" Color="Color.Primary" Elevation="1">
+    <MudSpacer />
+</MudAppBar>
+
+<MudMainContent>
+    <MudButton @onclick="DebugAddRecipes" StartIcon="@Icons.Filled.Fastfood" Variant="Variant.Filled">Debug</MudButton>
+
+    <MudList Clickable="true">
+        @foreach (var recipe in RecipesContainer.recipes)
+        {
+            <MudListItem @onclick="@(e => NavigateToShowRecipe((int)recipe.UID))" Text="@recipe.Title"/>
+        }
+    </MudList>
+
+</MudMainContent>
+
+<MudFab @onclick="NavigateToAddRecipe" Label="Add recipe" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Style="position: fixed; bottom: 20px; right:20px" />
+
+@code {
+
+    private void NavigateToShowRecipe(int UID)
+    {
+        NavigationManager.NavigateTo("viewRecipe/" + UID);
+    }
+
+    private void NavigateToAddRecipe()
+    {
+        NavigationManager.NavigateTo("addRecipe");
+    }
+
+    private void DebugAddRecipes()
+    {
+        Recipe breakfast = new Recipe { Title = "Breakfast", UID = (uint)RecipesContainer.recipes.Count() };
+        breakfast.Ingredients.Add(new Ingredient { Name = "Bacon", Quantity = 6, Units = "slices" });
+        breakfast.Ingredients.Add(new Ingredient { Name = "Eggs", Quantity = 4, Units = null });
+        breakfast.Ingredients.Add(new Ingredient { Name = "Avocado", Quantity = 1, Units = null });
+        breakfast.Ingredients.Add(new Ingredient { Name = "Feta", Quantity = 200, Units = "g" });
+        RecipesContainer.recipes.Add(breakfast);
+        
+        Recipe lunch = new Recipe { Title = "Lunch", UID = (uint)RecipesContainer.recipes.Count() };
+        lunch.Ingredients.Add(new Ingredient { Name = "Toast", Quantity = 2, Units = "slices" });
+        lunch.Ingredients.Add(new Ingredient { Name = "Avocado", Quantity = 1, Units = "half" });
+        lunch.Ingredients.Add(new Ingredient { Name = "Eggs", Quantity = 2, Units = null });
+        RecipesContainer.recipes.Add(lunch);
+        
+        Recipe dinner = new Recipe { Title = "Dinner", UID = (uint)RecipesContainer.recipes.Count() };
+        dinner.Ingredients.Add(new Ingredient { Name = "Chicken", Quantity = 500, Units = "g" });
+        dinner.Ingredients.Add(new Ingredient { Name = "Avocado", Quantity = 2, Units = null });
+        dinner.Ingredients.Add(new Ingredient { Name = "Cheese", Quantity = 1, Units = "handfull" });
+        dinner.Ingredients.Add(new Ingredient { Name = "Sour cream", Quantity = 1, Units = "tub" });
+        dinner.Ingredients.Add(new Ingredient { Name = "Old El Paso Taco kit", Quantity = 1, Units = null });
+        RecipesContainer.recipes.Add(dinner);
+    }
+}

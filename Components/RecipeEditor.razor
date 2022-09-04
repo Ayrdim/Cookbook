@@ -1,0 +1,63 @@
+@inject IDialogService DialogService
+@inject ILogger<RecipeEditor> logger
+
+<MudTextField @bind-Value="Recipe.Title" Label="Recipe title" Variant="Variant.Outlined" Required="true"></MudTextField>
+
+<MudList Clickable="true">
+    @foreach (var ingredient in Recipe.Ingredients)
+    {
+        <MudListItem @onclick="@(e => EditIngredient(ingredient))" Text="@ingredient.GetDescription()"/>
+    }
+</MudList>
+
+<MudFab @onclick="AddIngredient" Label="Add Ingredient" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Style="position: fixed; bottom: 20px; right:20px" />
+
+@code {
+
+    [Parameter]
+    public Recipe? Recipe { get; set; } = null;
+
+    @* TODO: is valid or something similar? *@
+
+    async Task AddIngredient()
+    {
+        Ingredient ingredient = new();
+
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+
+        var dialog = DialogService.Show<IngredientEditorDialog>("New ingredient");
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data is Ingredient newIngredient)
+            {
+                Recipe.Ingredients.Add(newIngredient);
+            }
+        }
+    }
+
+    async Task EditIngredient(Ingredient ingredient)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters();
+        parameters.Add("Ingredient", ingredient);
+
+        var dialog = DialogService.Show<IngredientEditorDialog>("Edit ingredient", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            // if dialog returns an ingredient then they hit edit,
+            // otherwise they would have hit delete
+            if (result.Data is Ingredient newIngredient)
+            {
+                ingredient.Copy(newIngredient);
+            }
+            else
+            {
+                Recipe.Ingredients.Remove(ingredient);
+            }
+        }
+    }
+}

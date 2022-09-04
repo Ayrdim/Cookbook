@@ -1,0 +1,62 @@
+@using Cookbook.Components
+@inject RecipesContainer RecipesContainer
+@inject NavigationManager NavigationManager
+
+@page "/editRecipe/{UID:int}"
+
+<MudAppBar Bottom="false" position="fixed" Color="Color.Primary" Elevation="1">
+    <MudIconButton @onclick="NavigateToCookbook" Icon="@Icons.Filled.ArrowBack" Color="Color.Inherit" Label="My name jeff" Edge="Edge.Start" />
+    <MudSpacer />
+    <MudIconButton @onclick="SaveRecipe" Icon="@Icons.Material.Filled.Save" Color="Color.Inherit" Edge="Edge.End" />
+</MudAppBar>
+
+<MudMainContent>
+    @if (null != oldRecipe)
+    {
+        <RecipeEditor Recipe="newRecipe" />
+    }
+    else 
+    {
+        <h1>Sorry, looks like that recipe doesn't exist!</h1>
+    }
+</MudMainContent>
+
+@code {
+    [Parameter]
+    public int UID { get; set; }
+
+    private Recipe? oldRecipe = null;
+    private Recipe newRecipe = new Recipe();
+    
+    private void NavigateToCookbook()
+    {
+        NavigationManager.NavigateTo("/recipeList");
+    }
+
+    private void SaveRecipe()
+    {
+        @* Validate input fields *@
+        @* Save to DB - if err then alert user *@
+        @* Get the UID value for the recipe we just stored in the db *@
+        @* Add it to the state *@
+        @* Return back to the cookbook *@
+
+
+        if (newRecipe.IsValid())
+        {
+            @* TODO: some db operation *@
+            oldRecipe.Copy(newRecipe);
+            NavigationManager.NavigateTo("/recipeList");
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        oldRecipe = RecipesContainer.recipes.Find(r => UID == r.UID);
+
+        if (null != oldRecipe)
+        {
+            newRecipe.Copy(oldRecipe);
+        }
+    }
+}
